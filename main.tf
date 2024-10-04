@@ -4,11 +4,12 @@ module "app_network" {
   
   network_name = "${var.network_name}-network"
   project_id   = var.project_id
+
   subnets = [
     {
       subnet_name   = "${var.network_name}-subnet-01"
-      subnet_ip     = "10.10.10.0/24"
-      subnet_region = "us-west1"
+      subnet_ip     = var.network_ip_range
+      subnet_region = var.region
     }
   ]
 
@@ -30,21 +31,9 @@ module "app_network" {
   ]
 }
 
-resource "google_compute_network" "app" {
-  name                    = var.network_name
-  auto_create_subnetworks = false
-}
-
-resource "google_compute_subnetwork" "app" {
-  name          = var.network_name
-  ip_cidr_range = var.network_ip_range
-  region        = var.region
-  network       = google_compute_network.app.id
-}
-
 data "google_compute_image" "ubuntu" {
   most_recent = true
-  project     = var.image_project
+  project     = var.image_project 
   family      = var.image_family
 }
 
