@@ -32,6 +32,7 @@ module "app_network" {
 
 resource "google_compute_network" "app" {
   name                    = var.network_name
+  auto_create_subnetworks = false
 }
 
 resource "google_compute_subnetwork" "app" {
@@ -51,6 +52,8 @@ resource "google_compute_instance" "web" {
   name         = var.app_name
   machine_type = var.machine_type
 
+  tags = ["${var.network_name}-web"]
+
   
   boot_disk {
     initialize_params {
@@ -62,6 +65,8 @@ resource "google_compute_instance" "web" {
    access_config {
       # Leave empty for dynamic public IP
     }
-  }  
+  }
+
+  metadata_startup_script = "apt -y update; apt -y install nginx; echo ${var.app_name} > /var/www/html/index.html"  
   allow_stopping_for_update = true
 }
